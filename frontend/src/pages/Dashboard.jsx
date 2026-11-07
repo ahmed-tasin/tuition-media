@@ -15,8 +15,7 @@ export default function Dashboard() {
   const isPendingTutor =
     user?.role === "tutor" && user?.status === "pending";
 
-  const isActive =
-    user?.status === "active";
+  const isActive = user?.status === "active";
 
   return (
     <div className="dashboard">
@@ -26,16 +25,9 @@ export default function Dashboard() {
       </header>
 
       <main className="dashboard-content">
-        <h1>
-  {activeTab === "overview"
-    ? "Dashboard Overview"
-    : activeTab === "pending"
-    ? "Pending Tutor Applications"
-    : activeTab === "tuition-offers"
-    ? "Tuition Offers Management"
-    : "User Management"}
-</h1>
+        <h1>{titles[user?.role] || "Dashboard"}</h1>
 
+        {/* User Information */}
         <div className="welcome-card">
           <h2>Welcome, {user?.name}</h2>
           <p>Phone: {user?.phone}</p>
@@ -44,6 +36,7 @@ export default function Dashboard() {
           <p>Status: {user?.status}</p>
         </div>
 
+        {/* Pending Tutor */}
         {isPendingTutor && (
           <div className="status-card pending">
             <h2>Application Under Review</h2>
@@ -58,16 +51,19 @@ export default function Dashboard() {
           </div>
         )}
 
-        {user?.status === "rejected" && (
-          <div className="status-card rejected">
-            <h2>Application Rejected</h2>
-            <p>
-              দুঃখিত, তোমার Tutor আবেদনটি অনুমোদিত হয়নি।
-              বিস্তারিত জানতে Admin-এর সঙ্গে যোগাযোগ করো।
-            </p>
-          </div>
-        )}
+        {/* Rejected Tutor */}
+        {user?.role === "tutor" &&
+          user?.status === "rejected" && (
+            <div className="status-card rejected">
+              <h2>Application Rejected</h2>
+              <p>
+                দুঃখিত, তোমার Tutor আবেদনটি অনুমোদিত হয়নি।
+                বিস্তারিত জানতে Admin-এর সঙ্গে যোগাযোগ করো।
+              </p>
+            </div>
+          )}
 
+        {/* Suspended Account */}
         {user?.status === "suspended" && (
           <div className="status-card rejected">
             <h2>Account Suspended</h2>
@@ -78,30 +74,23 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Active Tutor */}
         {isActive && user?.role === "tutor" && (
-          <div className="status-card active">
-            <h2>Account Approved</h2>
-            <p>তোমার Tutor Account সক্রিয় রয়েছে।</p>
-          </div>
+          <>
+            <div className="status-card active">
+              <h2>Account Approved</h2>
+              <p>তোমার Tutor Account সক্রিয় রয়েছে।</p>
+            </div>
+
+            <div className="tutor-dashboard-actions">
+              <Link to="/tutor/available-tuitions">
+                Browse Available Tuitions
+              </Link>
+            </div>
+          </>
         )}
 
-        {isActive && user?.role === "tutor" && (
-  <div className="tutor-dashboard-actions">
-    <Link to="/tutor/available-tuitions">
-      Browse Available Tuitions
-    </Link>
-  </div>
-)}
-
-
-{isActive && user?.role === "admin" && (
-  <div className="tutor-dashboard-actions">
-    <Link to="/admin/tuition-offers">
-      Manage Tuition Offers
-    </Link>
-  </div>
-)}
-
+        {/* Guardian */}
         {isActive && user?.role === "guardian" && (
           <div className="status-card active">
             <h2>Welcome to Tuition Media</h2>
@@ -109,18 +98,17 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Admin */}
         {isActive && user?.role === "admin" && (
           <div className="status-card active">
             <h2>Administrator Access</h2>
             <p>Admin account সক্রিয় রয়েছে।</p>
+
+            <Link to="/admin">
+              Go to Admin Panel
+            </Link>
           </div>
         )}
-
-        {activeTab === "tuition-offers" && (
-  
-    <TuitionOffers />
- 
-)}
       </main>
     </div>
   );

@@ -1,7 +1,7 @@
-
 import React, { useEffect, useState, useCallback } from "react";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import TuitionOffers from "./TuitionOffers";
 import {
   LayoutDashboard,
   Users,
@@ -17,7 +17,7 @@ import {
   X,
   Check,
   XCircle,
-  BookOpen
+  BookOpen,
 } from "lucide-react";
 
 const initialStats = {
@@ -28,14 +28,14 @@ const initialStats = {
   pendingTutors: 0,
   activeUsers: 0,
   suspendedUsers: 0,
-  rejectedTutors: 0
+  rejectedTutors: 0,
 };
 
 const statusColors = {
   active: "active",
   pending: "pending",
   suspended: "suspended",
-  rejected: "rejected"
+  rejected: "rejected",
 };
 
 export default function AdminDashboard() {
@@ -63,15 +63,12 @@ export default function AdminDashboard() {
 
       setStats({
         ...initialStats,
-        ...response.data.stats
+        ...response.data.stats,
       });
 
       setRecentUsers(response.data.recentUsers || []);
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "Dashboard data load করা যায়নি"
-      );
+      setError(err.response?.data?.message || "Dashboard data load করা যায়নি");
     }
   }, []);
 
@@ -86,17 +83,14 @@ export default function AdminDashboard() {
           limit: 20,
           search,
           role,
-          status
-        }
+          status,
+        },
       });
 
       setUsers(response.data.users || []);
       setTotalPages(response.data.pagination?.totalPages || 1);
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "User list load করা যায়নি"
-      );
+      setError(err.response?.data?.message || "User list load করা যায়নি");
     } finally {
       setLoading(false);
     }
@@ -121,67 +115,69 @@ export default function AdminDashboard() {
       setUpdatingId(id);
 
       await api.patch(`/admin/users/${id}/status`, {
-        status: newStatus
+        status: newStatus,
       });
 
       await Promise.all([loadDashboard(), loadUsers()]);
     } catch (err) {
-      alert(
-        err.response?.data?.message ||
-        "Status update করা যায়নি"
-      );
+      alert(err.response?.data?.message || "Status update করা যায়নি");
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const openTab = (tab) => {
-    setActiveTab(tab);
-    setSidebarOpen(false);
-    setPage(1);
+const openTab = (tab) => {
+  setActiveTab(tab);
+  setSidebarOpen(false);
+  setPage(1);
 
-    if (tab === "overview") {
-      loadDashboard();
-    }
-  };
+  if (tab === "users") {
+    setRole("");
+    setStatus("");
+  }
+
+  if (tab === "overview") {
+    loadDashboard();
+  }
+};
 
   const statCards = [
     {
       label: "Total Users",
       value: stats.totalUsers,
       icon: Users,
-      color: "blue"
+      color: "blue",
     },
     {
       label: "Total Tutors",
       value: stats.totalTutors,
       icon: GraduationCap,
-      color: "purple"
+      color: "purple",
     },
     {
       label: "Guardians",
       value: stats.totalGuardians,
       icon: UserRound,
-      color: "green"
+      color: "green",
     },
     {
       label: "Pending Tutors",
       value: stats.pendingTutors,
       icon: Clock,
-      color: "orange"
+      color: "orange",
     },
     {
       label: "Active Users",
       value: stats.activeUsers,
       icon: CheckCircle,
-      color: "teal"
+      color: "teal",
     },
     {
       label: "Suspended Users",
       value: stats.suspendedUsers,
       icon: Ban,
-      color: "red"
-    }
+      color: "red",
+    },
   ];
 
   const formatDate = (date) => {
@@ -190,7 +186,7 @@ export default function AdminDashboard() {
     return new Date(date).toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "short",
-      year: "numeric"
+      year: "numeric",
     });
   };
 
@@ -237,11 +233,7 @@ export default function AdminDashboard() {
           <option value="rejected">Rejected</option>
         </select>
 
-        <button
-          className="admin-refresh"
-          onClick={loadUsers}
-          title="Refresh"
-        >
+        <button className="admin-refresh" onClick={loadUsers} title="Refresh">
           <RefreshCw size={17} />
         </button>
       </div>
@@ -271,15 +263,12 @@ export default function AdminDashboard() {
                     </td>
                     <td>{item.phone}</td>
                     <td>
-                      <span className="role-badge">
-                        {item.role}
-                      </span>
+                      <span className="role-badge">{item.role}</span>
                     </td>
                     <td>
                       <span
-                        className={`status-badge ${
-                          statusColors[item.status] || ""
-                        }`}
+                        className={`status-badge ${statusColors[item.status] || ""
+                          }`}
                       >
                         {item.status}
                       </span>
@@ -292,9 +281,7 @@ export default function AdminDashboard() {
                             <button
                               className="action-approve"
                               disabled={updatingId === item._id}
-                              onClick={() =>
-                                changeStatus(item._id, "active")
-                              }
+                              onClick={() => changeStatus(item._id, "active")}
                               title="Approve / Activate"
                             >
                               <Check size={16} />
@@ -345,10 +332,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="admin-pagination">
-            <button
-              disabled={page <= 1}
-              onClick={() => setPage((p) => p - 1)}
-            >
+            <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
               Previous
             </button>
 
@@ -371,10 +355,7 @@ export default function AdminDashboard() {
   return (
     <div className="admin-layout">
       {sidebarOpen && (
-        <div
-          className="admin-overlay"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="admin-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
       <aside className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
@@ -420,15 +401,17 @@ export default function AdminDashboard() {
             <Clock size={19} />
             Pending Tutors
             {stats.pendingTutors > 0 && (
-              <span className="nav-count">
-                {stats.pendingTutors}
-              </span>
+              <span className="nav-count">{stats.pendingTutors}</span>
             )}
           </button>
 
-          
-
-
+          <button
+            className={activeTab === "tuition-offers" ? "selected" : ""}
+            onClick={() => openTab("tuition-offers")}
+          >
+            <BookOpen size={19} />
+            Tuition Offers
+          </button>
         </nav>
 
         <div className="admin-sidebar-bottom">
@@ -463,29 +446,30 @@ export default function AdminDashboard() {
               {activeTab === "overview"
                 ? "Dashboard Overview"
                 : activeTab === "pending"
-                ? "Pending Tutor Applications"
-                : "User Management"}
+                  ? "Pending Tutor Applications"
+                  : activeTab === "tuition-offers"
+                    ? "Tuition Offers Management"
+                    : "User Management"}
             </h1>
             <p>Welcome back, {user?.name}</p>
           </div>
 
-          <button
-            className="admin-refresh"
-            onClick={() =>
-              activeTab === "overview"
-                ? loadDashboard()
-                : loadUsers()
-            }
-          >
-            <RefreshCw size={17} />
-          </button>
+          {activeTab !== "tuition-offers" && (
+            <button
+              className="admin-refresh"
+              onClick={() =>
+                activeTab === "overview"
+                  ? loadDashboard()
+                  : loadUsers()
+              }
+              title="Refresh"
+            >
+              <RefreshCw size={17} />
+            </button>
+          )}
         </header>
 
-        {error && (
-          <div className="admin-error">
-            {error}
-          </div>
-        )}
+        {error && <div className="admin-error">{error}</div>}
 
         {activeTab === "overview" && (
           <>
@@ -514,9 +498,7 @@ export default function AdminDashboard() {
                   <p>Latest registered users</p>
                 </div>
 
-                <button onClick={() => openTab("users")}>
-                  View All
-                </button>
+                <button onClick={() => openTab("users")}>View All</button>
               </div>
 
               <div className="admin-table-wrap">
@@ -539,9 +521,8 @@ export default function AdminDashboard() {
                         <td>{item.role}</td>
                         <td>
                           <span
-                            className={`status-badge ${
-                              statusColors[item.status] || ""
-                            }`}
+                            className={`status-badge ${statusColors[item.status] || ""
+                              }`}
                           >
                             {item.status}
                           </span>
@@ -580,6 +561,8 @@ export default function AdminDashboard() {
             {renderUsers()}
           </section>
         )}
+
+        {activeTab === "tuition-offers" && <TuitionOffers />}
       </main>
     </div>
   );
